@@ -16,20 +16,15 @@ import org.geotools.data.FileDataStore;
 import org.geotools.data.FileDataStoreFinder;
 import org.geotools.data.Query;
 import org.geotools.data.simple.SimpleFeatureSource;
-import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.map.FeatureLayer;
 import org.geotools.map.Layer;
 import org.geotools.map.MapContent;
-import org.geotools.styling.SLDParser;
 import org.geotools.styling.Style;
-import org.geotools.styling.StyleFactory;
 import org.geotools.swing.JMapFrame;
 import org.geotools.swing.data.JFileDataStoreChooser;
-import org.geotools.swing.dialog.JExceptionReporter;
 import org.geotools.swing.styling.JSimpleStyleDialog;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.opengis.feature.Property;
@@ -41,12 +36,10 @@ public class DataLoader {
   private MapContent map;
   private File file;
   private JMapFrame show;
-  static StyleFactory styleFactory;
 
   public DataLoader() {
     this.map = null;
     this.file = null;
-    DataLoader.styleFactory = CommonFactoryFinder.getStyleFactory();
 
     //load file
     if (loadShapeFile()) {
@@ -81,7 +74,7 @@ public class DataLoader {
       this.map.setTitle("Shape-File reader");
 
       // Create a basic Style to render the features
-      Style style = createStyle(this.file, featureSource);
+      Style style = createStyle(featureSource);
 
       // Add the features and the associated Style object to
       // the MapContent as a new Layer
@@ -93,6 +86,15 @@ public class DataLoader {
     }
 
   }
+  
+   /**
+     * Create a Style to display the features: Display a
+     * JSimpleStyleDialog to prompt the user for preferences.
+     */
+    private Style createStyle(FeatureSource featureSource) {
+        SimpleFeatureType schema = (SimpleFeatureType) featureSource.getSchema();
+        return JSimpleStyleDialog.showDialog(null, schema);
+    }
 
   private void createMapFrame(MapContent map) {
     this.show = new JMapFrame(map);
@@ -237,55 +239,6 @@ public class DataLoader {
         e.printStackTrace();
       }
     }
-  }
-
-  /**
-   * Create a Style to display the features. If an SLD file is in the same directory as the
-   * shapefile then we will create the Style by processing this. Otherwise we display a
-   * JSimpleStyleDialog to prompt the user for preferences.
-   */
-  private Style createStyle(File file, FeatureSource featureSource) {
-    File sld = toSLDFile(file);
-    if (sld != null) {
-      return createFromSLD(sld);
-    }
-
-    SimpleFeatureType schema = (SimpleFeatureType) featureSource.getSchema();
-    return JSimpleStyleDialog.showDialog(null, schema);
-  }
-
-  /**
-   * Figure out if a valid SLD file is available.
-   */
-  public File toSLDFile(File file) {
-    String path = file.getAbsolutePath();
-    String base = path.substring(0, path.length() - 4);
-    String newPath = base + ".sld";
-    File sld = new File(newPath);
-    if (sld.exists()) {
-      return sld;
-    }
-    newPath = base + ".SLD";
-    sld = new File(newPath);
-    if (sld.exists()) {
-      return sld;
-    }
-    return null;
-  }
-
-  /**
-   * Create a Style object from a definition in a SLD document
-   */
-  private Style createFromSLD(File sld) {
-    try {
-      SLDParser stylereader = new SLDParser(DataLoader.styleFactory, sld.toURI().toURL());
-      Style[] style = stylereader.readXML();
-      return style[0];
-
-    } catch (Exception e) {
-      JExceptionReporter.showDialog(e, "Problem creating style");
-    }
-    return null;
   }
 
 }
