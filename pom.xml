@@ -38,7 +38,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>14</maven.compiler.source>
         <maven.compiler.target>14</maven.compiler.target>
-        <geotools.version>14.0</geotools.version>
+        <geotools.version>28-SNAPSHOT</geotools.version>
     </properties>
     <dependencies>
         <dependency>
@@ -55,6 +55,11 @@
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-swing</artifactId>
+            <version>${geotools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-epsg-hsql</artifactId>
             <version>${geotools.version}</version>
         </dependency>
         <dependency>

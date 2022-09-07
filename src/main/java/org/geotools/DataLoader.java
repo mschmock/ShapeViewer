@@ -108,7 +108,7 @@ public class DataLoader {
 
   private boolean loadShapeFile() {
     // display a data store file chooser dialog for shapefiles
-    File file = JFileDataStoreChooser.showOpenFile(".shp", new File("D:\\"), null);
+    File file = JFileDataStoreChooser.showOpenFile(".shp", null);
 
     if (file == null) {
       return false;
