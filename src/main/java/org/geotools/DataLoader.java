@@ -1,4 +1,3 @@
-
 package org.geotools;
 
 import ch.manuel.utilities.MyUtilities;
@@ -8,7 +7,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.text.NumberFormat.Style;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,98 +16,108 @@ import org.geotools.data.FileDataStore;
 import org.geotools.data.FileDataStoreFinder;
 import org.geotools.data.Query;
 import org.geotools.data.simple.SimpleFeatureSource;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.map.FeatureLayer;
 import org.geotools.map.Layer;
 import org.geotools.map.MapContent;
+import org.geotools.styling.SLDParser;
+import org.geotools.styling.Style;
+import org.geotools.styling.StyleFactory;
 import org.geotools.swing.JMapFrame;
 import org.geotools.swing.data.JFileDataStoreChooser;
+import org.geotools.swing.dialog.JExceptionReporter;
 import org.geotools.swing.styling.JSimpleStyleDialog;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
-
-
 public class DataLoader {
-    
-    private MapContent map;
-    private File file;
-    private JMapFrame show;
-    
-    
-    public DataLoader() {
-        this.map = null;
-        this.file = null;
-        
-        //load file
-        if( loadShapeFile() ) {
-            //prepare map
-            prepareMap();
-        }
-        // create MapFrame
-        createMapFrame( this.map );
-    }
-    
-    public void setVisible(boolean vis) {
-        this.show.setVisible( vis );
-    }
-    public boolean isOpen() {
-        return this.show.isVisible();
-    }
-    public void close() {
-        this.show.setVisible( false );
-    }
-    
-    
-    private void prepareMap() {
 
-        try {
-            //load data from file
-            FileDataStore store = FileDataStoreFinder.getDataStore(this.file);
-            FeatureSource featureSource = store.getFeatureSource();
-            
-             // Create a map content and add our shapefile to it
-            this.map = new MapContent();
-            this.map.setTitle("Shape-File reader");
+  private MapContent map;
+  private File file;
+  private JMapFrame show;
+  static StyleFactory styleFactory;
 
-            Style style = createStyle(this.file, featureSource);
-            Layer layer = new FeatureLayer(featureSource, style);
-            this.map.addLayer(layer);
+  public DataLoader() {
+    this.map = null;
+    this.file = null;
+    DataLoader.styleFactory = CommonFactoryFinder.getStyleFactory();
 
-        } catch (IOException ex) {
-            Logger.getLogger(DataLoader.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
+    //load file
+    if (loadShapeFile()) {
+      //prepare map
+      prepareMap();
     }
-    
-    private void createMapFrame( MapContent map ) {
-        this.show = new JMapFrame( map );
-        this.show.setSize(1000, 800);
-        this.show.enableToolBar( true );             // zoom in, zoom out, pan, show all
-        this.show.enableStatusBar( true );           // location of cursor and bounds of current
+    // create MapFrame
+    createMapFrame(this.map);
+  }
+
+  public void setVisible(boolean vis) {
+    this.show.setVisible(vis);
+  }
+
+  public boolean isOpen() {
+    return this.show.isVisible();
+  }
+
+  public void close() {
+    this.show.setVisible(false);
+  }
+
+  private void prepareMap() {
+
+    try {
+      //load data from file
+      FileDataStore store = FileDataStoreFinder.getDataStore(this.file);
+      FeatureSource featureSource = store.getFeatureSource();
+
+      // Create a map content and add our shapefile to it
+      this.map = new MapContent();
+      this.map.setTitle("Shape-File reader");
+
+      // Create a basic Style to render the features
+      Style style = createStyle(this.file, featureSource);
+
+      // Add the features and the associated Style object to
+      // the MapContent as a new Layer
+      Layer layer = new FeatureLayer(featureSource, style);
+      this.map.addLayer(layer);
+
+    } catch (IOException ex) {
+      Logger.getLogger(DataLoader.class.getName()).log(Level.SEVERE, null, ex);
+    }
+
+  }
+
+  private void createMapFrame(MapContent map) {
+    this.show = new JMapFrame(map);
+    this.show.setSize(1000, 800);
+    this.show.enableToolBar(true);             // zoom in, zoom out, pan, show all
+    this.show.enableStatusBar(true);           // location of cursor and bounds of current
 //        this.show.enableLayerTable( true );          // list layers and set them as visible + selected            
-        this.show.setVisible( true );
-        this.show.setDefaultCloseOperation(HIDE_ON_CLOSE);
-    }
-    
-    private boolean loadShapeFile() {
-        // display a data store file chooser dialog for shapefiles
-        File file = JFileDataStoreChooser.showOpenFile(".shp", new File("D:\\"), null);
+    this.show.setVisible(true);
+    this.show.setDefaultCloseOperation(HIDE_ON_CLOSE);
+  }
 
-        if(file == null) {
-            return false;
-        } else {
-            this.file = file;
-            return true;
-        }
-        
+  private boolean loadShapeFile() {
+    // display a data store file chooser dialog for shapefiles
+    File file = JFileDataStoreChooser.showOpenFile(".shp", new File("D:\\"), null);
+
+    if (file == null) {
+      return false;
+    } else {
+      this.file = file;
+      return true;
     }
-    
-    private JSONArray createJSON(File file) throws IOException {
+
+  }
+
+  private JSONArray createJSON(File file) throws IOException {
 
 //        Map<String, Object> map = new HashMap<>();
 //        try {
@@ -138,145 +146,146 @@ public class DataLoader {
 //                System.out.println(feature.getDefaultGeometryProperty().getValue());
 //            }
 //        }
-        
-        FileDataStore myData = FileDataStoreFinder.getDataStore(file);
-        SimpleFeatureSource source2 = myData.getFeatureSource();
-        SimpleFeatureType schema = source2.getSchema();
+    FileDataStore myData = FileDataStoreFinder.getDataStore(file);
+    SimpleFeatureSource source2 = myData.getFeatureSource();
+    SimpleFeatureType schema = source2.getSchema();
 
-        Query query = new Query(schema.getTypeName());
-        //query.setMaxFeatures(10);     //Anzahl Datensätze begrenzen
+    Query query = new Query(schema.getTypeName());
+    //query.setMaxFeatures(10);     //Anzahl Datensätze begrenzen
 
-        FeatureCollection<SimpleFeatureType, SimpleFeature> collection = source2.getFeatures(query);
-        
-        //JSON level 0: holds all elements
-        JSONArray objList = new JSONArray(); 
-        
-        try (FeatureIterator<SimpleFeature> features = collection.features()) {
-            
-            
-            //JSON level 1: id of element
-            ArrayList<JSONObject> objIDList = new ArrayList<JSONObject>();
-            //JSON level 2: attributes
-            ArrayList<JSONObject> objAttributes = new ArrayList<JSONObject>();
-            
-            while (features.hasNext()) {
-                SimpleFeature feature = features.next();
-                
-                //JSON level 1: id of element
-                JSONObject tmpJSONobj1 = new JSONObject();
-                objIDList.add( tmpJSONobj1 );                
-                //JSON level 2: attributes
-                JSONObject tmpJSONobj2 = new JSONObject();
-                objAttributes.add( tmpJSONobj2 );
-                
-                for (Property attribute : feature.getProperties()) {
+    FeatureCollection<SimpleFeatureType, SimpleFeature> collection = source2.getFeatures(query);
 
-                    //exeption for "the_geom"
-                    String attName = attribute.getName().toString();
-                    if( attName.equals("the_geom") ) {
-                        //System.out.println("\tTest:" + attribute.getValue());
-                        int indStart = attribute.getValue().toString().indexOf("(((");
-                        int indEnd = attribute.getValue().toString().indexOf(")))");
-                        String strPolygon = attribute.getValue().toString().substring(indStart+3, indEnd);
-                        
-                        //JSON level 2: first attribute
-                        tmpJSONobj2.put("POLYGON", strPolygon);
+    //JSON level 0: holds all elements
+    JSONArray objList = new JSONArray();
 
-                    } else {
-                        //JSON level 2: first attribute
-                        tmpJSONobj2.put(attribute.getName(), attribute.getValue());
+    try ( FeatureIterator<SimpleFeature> features = collection.features()) {
 
-                    }
-                }
-                //JSON level 1: id of element
-                tmpJSONobj1.put("id", feature.getID());
-                tmpJSONobj1.put("attributes", tmpJSONobj2);
-                
-                //JSON level 0: id of element
-                objList.add(tmpJSONobj1);
-            }
-            
+      //JSON level 1: id of element
+      ArrayList<JSONObject> objIDList = new ArrayList<JSONObject>();
+      //JSON level 2: attributes
+      ArrayList<JSONObject> objAttributes = new ArrayList<JSONObject>();
+
+      while (features.hasNext()) {
+        SimpleFeature feature = features.next();
+
+        //JSON level 1: id of element
+        JSONObject tmpJSONobj1 = new JSONObject();
+        objIDList.add(tmpJSONobj1);
+        //JSON level 2: attributes
+        JSONObject tmpJSONobj2 = new JSONObject();
+        objAttributes.add(tmpJSONobj2);
+
+        for (Property attribute : feature.getProperties()) {
+
+          //exeption for "the_geom"
+          String attName = attribute.getName().toString();
+          if (attName.equals("the_geom")) {
+            //System.out.println("\tTest:" + attribute.getValue());
+            int indStart = attribute.getValue().toString().indexOf("(((");
+            int indEnd = attribute.getValue().toString().indexOf(")))");
+            String strPolygon = attribute.getValue().toString().substring(indStart + 3, indEnd);
+
+            //JSON level 2: first attribute
+            tmpJSONobj2.put("POLYGON", strPolygon);
+
+          } else {
+            //JSON level 2: first attribute
+            tmpJSONobj2.put(attribute.getName(), attribute.getValue());
+
+          }
         }
-        return objList;
+        //JSON level 1: id of element
+        tmpJSONobj1.put("id", feature.getID());
+        tmpJSONobj1.put("attributes", tmpJSONobj2);
+
+        //JSON level 0: id of element
+        objList.add(tmpJSONobj1);
+      }
+
+    }
+    return objList;
+  }
+
+  public void startExport() {
+
+    // JSON-object to write to file
+    JSONArray jsonObj = null;
+
+    if (this.file == null) {
+      // no file
+      MyUtilities.getErrorMsg("Fehler", "Keine Datei für den Output vorhanden!");
+    } else {
+      // get JSON
+      try {
+        jsonObj = this.createJSON(this.file);
+      } catch (IOException ex) {
+        Logger.getLogger(DataLoader.class.getName()).log(Level.SEVERE, null, ex);
+      }
+
+      // write JSON to file
+      Charset utf8 = StandardCharsets.UTF_8;
+      String fileName = MyUtilities.dialogSave();
+
+      // open output stream
+      try {
+        OutputStreamWriter fstream = new OutputStreamWriter(new FileOutputStream(fileName), utf8);
+        //FileWriter file = new FileWriter(fileName); 
+        fstream.write(jsonObj.toJSONString());
+        fstream.close();
+
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+  /**
+   * Create a Style to display the features. If an SLD file is in the same directory as the
+   * shapefile then we will create the Style by processing this. Otherwise we display a
+   * JSimpleStyleDialog to prompt the user for preferences.
+   */
+  private Style createStyle(File file, FeatureSource featureSource) {
+    File sld = toSLDFile(file);
+    if (sld != null) {
+      return createFromSLD(sld);
     }
 
-    public void startExport() {
-        
-        // JSON-object to write to file
-        JSONArray jsonObj = null;
-        
-        if( this.file == null) {
-            // no file
-            MyUtilities.getErrorMsg("Fehler", "Keine Datei für den Output vorhanden!");
-        } else {
-            // get JSON
-            try {
-                jsonObj = this.createJSON(this.file);
-            } catch (IOException ex) {
-                Logger.getLogger(DataLoader.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-            // write JSON to file
-            Charset utf8 = StandardCharsets.UTF_8;
-            String fileName = MyUtilities.dialogSave();
-            
-            // open output stream
-            try {
-                OutputStreamWriter fstream = new OutputStreamWriter(new FileOutputStream(fileName), utf8);
-                //FileWriter file = new FileWriter(fileName); 
-                fstream.write(jsonObj.toJSONString());
-                fstream.close();
+    SimpleFeatureType schema = (SimpleFeatureType) featureSource.getSchema();
+    return JSimpleStyleDialog.showDialog(null, schema);
+  }
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }              
+  /**
+   * Figure out if a valid SLD file is available.
+   */
+  public File toSLDFile(File file) {
+    String path = file.getAbsolutePath();
+    String base = path.substring(0, path.length() - 4);
+    String newPath = base + ".sld";
+    File sld = new File(newPath);
+    if (sld.exists()) {
+      return sld;
     }
-    
-        /**
-     * Create a Style to display the features. If an SLD file is in the same directory as the
-     * shapefile then we will create the Style by processing this. Otherwise we display a
-     * JSimpleStyleDialog to prompt the user for preferences.
-     */
-    private Style createStyle(File file, FeatureSource featureSource) {
-        File sld = toSLDFile(file);
-        if (sld != null) {
-            return createFromSLD(sld);
-        }
+    newPath = base + ".SLD";
+    sld = new File(newPath);
+    if (sld.exists()) {
+      return sld;
+    }
+    return null;
+  }
 
-        SimpleFeatureType schema = (SimpleFeatureType) featureSource.getSchema();
-        return JSimpleStyleDialog.showDialog(null, schema);
-    }
-    
-        /** Figure out if a valid SLD file is available. */
-    public File toSLDFile(File file) {
-        String path = file.getAbsolutePath();
-        String base = path.substring(0, path.length() - 4);
-        String newPath = base + ".sld";
-        File sld = new File(newPath);
-        if (sld.exists()) {
-            return sld;
-        }
-        newPath = base + ".SLD";
-        sld = new File(newPath);
-        if (sld.exists()) {
-            return sld;
-        }
-        return null;
-    }
+  /**
+   * Create a Style object from a definition in a SLD document
+   */
+  private Style createFromSLD(File sld) {
+    try {
+      SLDParser stylereader = new SLDParser(DataLoader.styleFactory, sld.toURI().toURL());
+      Style[] style = stylereader.readXML();
+      return style[0];
 
-    /** Create a Style object from a definition in a SLD document */
-    private Style createFromSLD(File sld) {
-        try {
-            SLDParser stylereader = new SLDParser(styleFactory, sld.toURI().toURL());
-            Style[] style = stylereader.readXML();
-            return style[0];
-
-        } catch (Exception e) {
-            JExceptionReporter.showDialog(e, "Problem creating style");
-        }
-        return null;
+    } catch (Exception e) {
+      JExceptionReporter.showDialog(e, "Problem creating style");
     }
-    
+    return null;
+  }
 
 }
