@@ -47,7 +47,7 @@ public class DataLoader {
     this.file = null;
 
     //load file
-    if (loadShapeFile()) {
+    if( loadShapeFile() ) {
       //prepare map
       prepareMap();
     }
@@ -67,8 +67,9 @@ public class DataLoader {
     this.mapFrame.setVisible(false);
   }
 
+  
+  // 
   private void prepareMap() {
-
     try {
       //load data from file
       FileDataStore store = FileDataStoreFinder.getDataStore(this.file);
@@ -106,7 +107,7 @@ public class DataLoader {
     this.mapFrame.setSize(1000, 800);
     this.mapFrame.enableToolBar(true);             // zoom in, zoom out, pan, show all
     this.mapFrame.enableStatusBar(true);           // location of cursor and bounds of current
-//        this.show.enableLayerTable( true );          // list layers and set them as visible + selected            
+//    this.mapFrame.enableLayerTable( true );          // list layers and set them as visible + selected            
     this.mapFrame.setVisible(true);
     this.mapFrame.setDefaultCloseOperation(HIDE_ON_CLOSE);
   }
@@ -124,35 +125,9 @@ public class DataLoader {
 
   }
 
+  // extract data from Shape file and create a JSON file
   private JSONArray createJSON(File file) throws IOException {
 
-//        Map<String, Object> map = new HashMap<>();
-//        try {
-//            map.put("url", file.toURI().toURL());
-//        } catch (MalformedURLException ex) {
-//            Logger.getLogger(DataLoader.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//
-//        DataStore dataStore = null;
-//        try {
-//            dataStore = DataStoreFinder.getDataStore(map);
-//        } catch (IOException ex) {
-//            Logger.getLogger(DataLoader.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        String typeName = dataStore.getTypeNames()[0];
-//
-//        FeatureSource<SimpleFeatureType, SimpleFeature> source = dataStore.getFeatureSource(typeName);
-//        Filter filter = Filter.INCLUDE; // ECQL.toFilter("BBOX(THE_GEOM, 10,20,30,40)")
-//
-//        FeatureCollection<SimpleFeatureType, SimpleFeature> collection = source.getFeatures(filter);
-//        try (FeatureIterator<SimpleFeature> features = collection.features()) {
-//            while (features.hasNext()) {
-//                SimpleFeature feature = features.next();
-//                System.out.print(feature.getID());
-//                System.out.print(": ");
-//                System.out.println(feature.getDefaultGeometryProperty().getValue());
-//            }
-//        }
     FileDataStore myData = FileDataStoreFinder.getDataStore(file);
     SimpleFeatureSource source2 = myData.getFeatureSource();
     SimpleFeatureType schema = source2.getSchema();
@@ -168,9 +143,9 @@ public class DataLoader {
     try ( FeatureIterator<SimpleFeature> features = collection.features()) {
 
       //JSON level 1: id of element
-      ArrayList<JSONObject> objIDList = new ArrayList<JSONObject>();
+      ArrayList<JSONObject> objIDList = new ArrayList<>();
       //JSON level 2: attributes
-      ArrayList<JSONObject> objAttributes = new ArrayList<JSONObject>();
+      ArrayList<JSONObject> objAttributes = new ArrayList<>();
 
       while (features.hasNext()) {
         SimpleFeature feature = features.next();
@@ -182,8 +157,7 @@ public class DataLoader {
         JSONObject tmpJSONobj2 = new JSONObject();
         objAttributes.add(tmpJSONobj2);
 
-        for (Property attribute : feature.getProperties()) {
-
+        feature.getProperties().forEach(attribute -> {
           //exeption for "the_geom"
           String attName = attribute.getName().toString();
           if (attName.equals("the_geom")) {
@@ -200,7 +174,7 @@ public class DataLoader {
             tmpJSONobj2.put(attribute.getName(), attribute.getValue());
 
           }
-        }
+        });
         //JSON level 1: id of element
         tmpJSONobj1.put("id", feature.getID());
         tmpJSONobj1.put("attributes", tmpJSONobj2);
@@ -213,8 +187,8 @@ public class DataLoader {
     return objList;
   }
 
+  // start export of JSON file
   public void startExport() {
-
     // JSON-object to write to file
     JSONArray jsonObj = null;
 
@@ -240,8 +214,8 @@ public class DataLoader {
         fstream.write(jsonObj.toJSONString());
         fstream.close();
 
-      } catch (IOException e) {
-        e.printStackTrace();
+      } catch (IOException ex) {
+        Logger.getLogger(DataLoader.class.getName()).log(Level.WARNING, null, ex);
       }
     }
   }
