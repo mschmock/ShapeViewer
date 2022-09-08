@@ -1,4 +1,9 @@
-package org.geotools;
+/**
+ * Autor: Manuel Schmocker
+ * Date: 08.09.2022
+ */
+
+package ch.manuel.shp;
 
 import ch.manuel.utilities.MyUtilities;
 import java.io.File;
@@ -35,7 +40,7 @@ public class DataLoader {
 
   private MapContent map;
   private File file;
-  private JMapFrame show;
+  private JMapFrame mapFrame;
 
   public DataLoader() {
     this.map = null;
@@ -51,15 +56,15 @@ public class DataLoader {
   }
 
   public void setVisible(boolean vis) {
-    this.show.setVisible(vis);
+    this.mapFrame.setVisible(vis);
   }
 
   public boolean isOpen() {
-    return this.show.isVisible();
+    return this.mapFrame.isVisible();
   }
 
   public void close() {
-    this.show.setVisible(false);
+    this.mapFrame.setVisible(false);
   }
 
   private void prepareMap() {
@@ -97,13 +102,13 @@ public class DataLoader {
     }
 
   private void createMapFrame(MapContent map) {
-    this.show = new JMapFrame(map);
-    this.show.setSize(1000, 800);
-    this.show.enableToolBar(true);             // zoom in, zoom out, pan, show all
-    this.show.enableStatusBar(true);           // location of cursor and bounds of current
+    this.mapFrame = new JMapFrame(map);
+    this.mapFrame.setSize(1000, 800);
+    this.mapFrame.enableToolBar(true);             // zoom in, zoom out, pan, show all
+    this.mapFrame.enableStatusBar(true);           // location of cursor and bounds of current
 //        this.show.enableLayerTable( true );          // list layers and set them as visible + selected            
-    this.show.setVisible(true);
-    this.show.setDefaultCloseOperation(HIDE_ON_CLOSE);
+    this.mapFrame.setVisible(true);
+    this.mapFrame.setDefaultCloseOperation(HIDE_ON_CLOSE);
   }
 
   private boolean loadShapeFile() {
