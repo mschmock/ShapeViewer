@@ -33,14 +33,15 @@ public class MainFrame extends javax.swing.JFrame {
     jMenuItem2 = new javax.swing.JMenuItem();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-    setTitle("Control panel");
-    setAlwaysOnTop(true);
+    setTitle("Shape File Reader");
     setLocation(new java.awt.Point(300, 200));
-    setPreferredSize(new java.awt.Dimension(290, 150));
     setResizable(false);
     setSize(new java.awt.Dimension(290, 150));
 
     jButton1.setText("Shape-File laden");
+    jButton1.setMaximumSize(new java.awt.Dimension(115, 25));
+    jButton1.setMinimumSize(new java.awt.Dimension(115, 25));
+    jButton1.setPreferredSize(new java.awt.Dimension(115, 25));
     jButton1.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         jButton1ActionPerformed(evt);
@@ -58,6 +59,9 @@ public class MainFrame extends javax.swing.JFrame {
     });
 
     jButton3.setText("Export JSON");
+    jButton3.setMaximumSize(new java.awt.Dimension(115, 25));
+    jButton3.setMinimumSize(new java.awt.Dimension(115, 25));
+    jButton3.setPreferredSize(new java.awt.Dimension(115, 25));
     jButton3.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         jButton3ActionPerformed(evt);
@@ -79,6 +83,11 @@ public class MainFrame extends javax.swing.JFrame {
     jMenu2.setText("Edit");
 
     jMenuItem2.setText("Info");
+    jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jMenuItem2ActionPerformed(evt);
+      }
+    });
     jMenu2.add(jMenuItem2);
 
     jMenuBar1.add(jMenu2);
@@ -92,15 +101,14 @@ public class MainFrame extends javax.swing.JFrame {
       .addGroup(layout.createSequentialGroup()
         .addContainerGap()
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+          .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE)
           .addGroup(layout.createSequentialGroup()
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-              .addGroup(layout.createSequentialGroup()
-                .addComponent(jButton1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton3))
-              .addComponent(jLabel1))
-            .addGap(0, 53, Short.MAX_VALUE)))
+            .addComponent(jLabel1)
+            .addGap(0, 0, Short.MAX_VALUE))
+          .addGroup(layout.createSequentialGroup()
+            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)))
         .addContainerGap())
     );
     layout.setVerticalGroup(
@@ -110,8 +118,8 @@ public class MainFrame extends javax.swing.JFrame {
         .addComponent(jLabel1)
         .addGap(18, 18, 18)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-          .addComponent(jButton1)
-          .addComponent(jButton3))
+          .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         .addGap(18, 18, 18)
         .addComponent(jButton2)
         .addContainerGap(16, Short.MAX_VALUE))
@@ -136,6 +144,11 @@ public class MainFrame extends javax.swing.JFrame {
     // Menu: click exit
     System.exit(0);
   }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+  private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+    // Menu: click info
+    Startup.infoForm.setVisible(true);
+  }//GEN-LAST:event_jMenuItem2ActionPerformed
 
   private void loadData() {
     // prepare geodatas

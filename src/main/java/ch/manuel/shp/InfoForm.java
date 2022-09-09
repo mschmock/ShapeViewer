@@ -4,10 +4,12 @@
  */
 package ch.manuel.shp;
 
+import com.google.common.io.Resources;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,7 +53,12 @@ public class InfoForm extends javax.swing.JDialog {
 
     jLabel1.setText("jLabel1");
 
-    jButton1.setText("jButton1");
+    jButton1.setText("Close");
+    jButton1.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jButton1ActionPerformed(evt);
+      }
+    });
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
     getContentPane().setLayout(layout);
@@ -64,7 +71,7 @@ public class InfoForm extends javax.swing.JDialog {
       .addGroup(layout.createSequentialGroup()
         .addGap(152, 152, 152)
         .addComponent(jButton1)
-        .addContainerGap(175, Short.MAX_VALUE))
+        .addContainerGap(187, Short.MAX_VALUE))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -79,19 +86,23 @@ public class InfoForm extends javax.swing.JDialog {
     pack();
   }// </editor-fold>//GEN-END:initComponents
 
+  private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    // click Close: set visible --> false
+    this.setVisible(false);
+  }//GEN-LAST:event_jButton1ActionPerformed
+
   // get data from html
   private void loadHTML() {
-
     // get File: info.html
-    InputStream in = getClass().getResourceAsStream(dataHTML);
-    String text = new BufferedReader(
-      new InputStreamReader(in, StandardCharsets.UTF_8))
-            .lines()
-            .collect(Collectors.joining("\n"));
-    
-    System.out.print(text);
+    URL url = Startup.class.getResource(dataHTML);
+    String text = "Error";
+    try {
+      text = Resources.toString(url, StandardCharsets.UTF_8);
+    } catch (IOException ex) {
+      Logger.getLogger(Startup.class.getName()).log(Level.SEVERE, null, ex);
+    }
 
-    jLabel1.setText("blabla");
+    jLabel1.setText(text);
   }
 
 

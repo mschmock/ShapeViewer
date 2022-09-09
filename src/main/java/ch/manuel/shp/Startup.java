@@ -4,13 +4,14 @@ package ch.manuel.shp;
 
 import ch.manuel.utilities.MyUtilities;
 
+
 public class Startup {
 
   public static MainFrame mainFrame;
   public static InfoForm infoForm;
 
   public static void main(String[] args) {
-
+    
     // Set Look and Feel
     MyUtilities.setLaF("Windows");
 
