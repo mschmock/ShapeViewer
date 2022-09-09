@@ -55,9 +55,13 @@ public class MyUtilities {
         else return false;
     }
     
-    //Fehler bei Eingabe: Fenster mit Fehlercode
+    // Fehler bei Eingabe: Fenster mit Fehlercode
     public static void getErrorMsg(String titel, String initTxt){
         JOptionPane.showMessageDialog(null, initTxt, titel , JOptionPane.ERROR_MESSAGE);
+    }
+    // show message
+    public static void showMsg(String titel, String initTxt){
+        JOptionPane.showMessageDialog(null, initTxt, titel , JOptionPane.INFORMATION_MESSAGE);
     }
     
     //Look and Feel festlegen
@@ -160,8 +164,4 @@ public class MyUtilities {
         }
     }
     
-    //Nachricht anzeigen: Titel + Warning icon
-    private static void getMessage(String text1, String text2){
-        JOptionPane.showMessageDialog(null, text1, text2, JOptionPane.WARNING_MESSAGE);
-    }
 }

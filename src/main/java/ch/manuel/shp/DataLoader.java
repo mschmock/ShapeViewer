@@ -32,7 +32,6 @@ import org.geotools.swing.data.JFileDataStoreChooser;
 import org.geotools.swing.styling.JSimpleStyleDialog;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -127,7 +126,6 @@ public class DataLoader {
 
   // extract data from Shape file and create a JSON file
   private JSONArray createJSON(File file) throws IOException {
-
     FileDataStore myData = FileDataStoreFinder.getDataStore(file);
     SimpleFeatureSource source2 = myData.getFeatureSource();
     SimpleFeatureType schema = source2.getSchema();
@@ -213,7 +211,7 @@ public class DataLoader {
         //FileWriter file = new FileWriter(fileName); 
         fstream.write(jsonObj.toJSONString());
         fstream.close();
-
+        MyUtilities.showMsg("Export data", "JSON file created!");
       } catch (IOException ex) {
         Logger.getLogger(DataLoader.class.getName()).log(Level.WARNING, null, ex);
       }
